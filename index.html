@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open Brick Lab</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="panel controls">
+        <p class="eyebrow">Browser + OpenSCAD subset</p>
+        <h1>Open Brick Lab</h1>
+        <p class="intro">
+          Pick a brick template, tune parameters, preview the result, and export an STL generated fully in your
+          browser from a <code>.scad</code> source file.
+        </p>
+
+        <label class="field" for="templateSelect">
+          Brick type
+          <select id="templateSelect"></select>
+        </label>
+
+        <div id="parameterControls" class="params"></div>
+
+        <div class="button-row">
+          <button id="downloadButton" type="button" disabled>Download STL</button>
+        </div>
+
+        <p id="status" role="status" class="status">Loading templates...</p>
+      </section>
+
+      <section class="panel preview">
+        <canvas id="previewCanvas" width="920" height="640"></canvas>
+        <p class="hint">Drag to rotate, or use the sliders for easier control.</p>
+
+        <div class="view-controls">
+          <label class="mini-field" for="rotationX">
+            Pitch
+            <input id="rotationX" type="range" min="-180" max="180" step="1" value="-52" />
+          </label>
+
+          <label class="mini-field" for="rotationY">
+            Yaw
+            <input id="rotationY" type="range" min="-180" max="180" step="1" value="46" />
+          </label>
+
+          <button id="resetViewButton" class="secondary" type="button">Reset View</button>
+        </div>
+
+        <details class="scad-box">
+          <summary>Active SCAD</summary>
+          <pre id="scadSource"></pre>
+        </details>
+      </section>
+    </main>
+
+    <script type="module" src="./src/app.js?v=20260206c"></script>
+  </body>
+</html>

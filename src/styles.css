@@ -1,0 +1,261 @@
+:root {
+  --bg-deep: #0d1016;
+  --bg-mid: #141b24;
+  --bg-soft: #1a2330;
+  --panel: #111822;
+  --panel-alt: #0f1520;
+  --ink: #e8edf4;
+  --muted: #9fafc3;
+  --accent: #39d0bf;
+  --accent-strong: #23b4a4;
+  --danger: #ff7e6a;
+  --border: #29384c;
+  --shadow: rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Avenir Next", "Futura", "Gill Sans", "Trebuchet MS", sans-serif;
+  background:
+    radial-gradient(1100px 560px at 0% -10%, #1f2735 0%, transparent 65%),
+    radial-gradient(950px 520px at 100% 0%, #10212a 0%, transparent 70%),
+    linear-gradient(170deg, var(--bg-deep), var(--bg-mid));
+}
+
+code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+}
+
+.layout {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: minmax(300px, 390px) 1fr;
+  gap: 1rem;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #121b27 0%, #0e151e 100%);
+  box-shadow: 0 14px 28px var(--shadow);
+}
+
+.controls {
+  padding: 1.2rem 1.2rem 1rem;
+}
+
+.preview {
+  position: relative;
+  padding: 0.8rem;
+  background: linear-gradient(150deg, #111a25 0%, #0f1620 100%);
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.intro {
+  margin: 0.65rem 0 1.1rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.8rem;
+  color: #d8e3ef;
+  font-weight: 600;
+}
+
+select,
+input[type="number"] {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #34485f;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.95rem;
+  color: #e6eef8;
+  background: #172131;
+}
+
+.params {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
+}
+
+.param {
+  border: 1px solid #2a3b50;
+  border-radius: 10px;
+  padding: 0.55rem 0.55rem 0.65rem;
+  background: linear-gradient(180deg, #121c2a 0%, #121b28 100%);
+}
+
+.param-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 0.35rem;
+}
+
+.param-head label {
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.param-head output {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 0.82rem;
+  color: #9ec6de;
+}
+
+.param input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.button-row {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.7rem;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.64rem 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #091317;
+  background: var(--accent);
+  transition: background 120ms ease-in;
+}
+
+button:hover {
+  background: var(--accent-strong);
+}
+
+button.secondary {
+  color: #d6e2f0;
+  background: #27384e;
+}
+
+button.secondary:hover {
+  background: #324b68;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.status {
+  margin: 0.95rem 0 0;
+  font-size: 0.9rem;
+  color: #c3d2e3;
+  min-height: 1.2rem;
+}
+
+.status.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+#previewCanvas {
+  width: 100%;
+  min-height: 500px;
+  border: 1px solid #2b3e53;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #131f2e 0%, #101721 100%);
+  touch-action: none;
+}
+
+.hint {
+  margin: 0.55rem 0 0.5rem;
+  color: #afc4d7;
+  font-size: 0.88rem;
+}
+
+.view-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.6rem;
+  align-items: end;
+  margin-bottom: 0.7rem;
+}
+
+.mini-field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: #ccdae9;
+  font-weight: 600;
+}
+
+.mini-field input[type="range"] {
+  width: 100%;
+  accent-color: #78e0d4;
+}
+
+.scad-box {
+  border-top: 1px solid #2a3a4f;
+  padding-top: 0.55rem;
+}
+
+.scad-box summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #d3deea;
+}
+
+.scad-box pre {
+  margin: 0.65rem 0 0;
+  max-height: 260px;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid #2d3f54;
+  background: #0b1119;
+  color: #c5d4e5;
+  padding: 0.7rem;
+  font-size: 0.81rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 1080px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  #previewCanvas {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 620px) {
+  .view-controls {
+    grid-template-columns: 1fr;
+  }
+}

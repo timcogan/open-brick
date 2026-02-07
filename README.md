@@ -13,6 +13,10 @@
 
 Open Brick Lab is a browser-based tool for creating classic interlocking bricks and exporting them as STL files for 3D printing.
 
+Brick type roadmap:
+
+[`BRICK_TYPES_TODO.md`](./BRICK_TYPES_TODO.md)
+
 ## Shareable URLs (Query Params)
 Share a specific brick configuration with:
 

@@ -50,12 +50,14 @@ code {
 
 .controls {
   padding: 1.2rem 1.2rem 1rem;
+  align-self: start;
 }
 
 .preview {
   position: relative;
   padding: 0.8rem;
   background: linear-gradient(150deg, #111a25 0%, #0f1620 100%);
+  min-width: 0;
 }
 
 .eyebrow {
@@ -189,7 +191,7 @@ button:disabled {
   min-height: 500px;
   border: 1px solid #2b3e53;
   border-radius: 14px;
-  background: linear-gradient(180deg, #131f2e 0%, #101721 100%);
+  background: linear-gradient(180deg, #0b121b 0%, #070c13 100%);
   touch-action: none;
 }
 
@@ -235,6 +237,7 @@ button:disabled {
   margin: 0.65rem 0 0;
   max-height: 260px;
   overflow: auto;
+  overflow-x: hidden;
   border-radius: 10px;
   border: 1px solid #2d3f54;
   background: #0b1119;
@@ -242,6 +245,9 @@ button:disabled {
   padding: 0.7rem;
   font-size: 0.81rem;
   line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @media (max-width: 1080px) {

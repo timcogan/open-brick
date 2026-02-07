@@ -350,8 +350,8 @@ function renderPreview() {
 
 function drawBackdrop(context, width, height) {
   const gradient = context.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, "#162538");
-  gradient.addColorStop(1, "#0f1621");
+  gradient.addColorStop(0, "#0c1420");
+  gradient.addColorStop(1, "#070b12");
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
 }

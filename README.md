@@ -1,5 +1,8 @@
 # Open Brick Lab
 
+## Live App
+[https://openbrick.cogan.dev](https://openbrick.cogan.dev)
+
 Open Brick Lab is a browser-based tool for creating classic interlocking bricks and exporting them as STL files for 3D printing.
 
 ## What You Can Do

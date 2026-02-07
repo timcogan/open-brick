@@ -141,6 +141,7 @@ input[type="number"] {
 .button-row {
   margin-top: 1rem;
   display: flex;
+  justify-content: center;
   gap: 0.7rem;
 }
 

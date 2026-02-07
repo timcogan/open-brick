@@ -43,6 +43,18 @@ test('scaled model grows when scale_percent increases', () => {
   assert.ok(largerBounds.size[2] > baseBounds.size[2]);
 });
 
+test('1x1 brick configuration generates valid geometry', () => {
+  const params = { ...defaultParams(), X: 1, Y: 1, Z: 3, scale_percent: 100 };
+  const triangles = evaluateScad(ast, params);
+  const bounds = computeBounds(triangles);
+
+  assert.ok(triangles.length > 0);
+  assert.ok(bounds);
+  assert.ok(bounds.size[0] > 0);
+  assert.ok(bounds.size[1] > 0);
+  assert.ok(bounds.size[2] > 0);
+});
+
 test('STL export includes the expected solid header/footer', () => {
   const triangles = evaluateScad(ast, defaultParams());
   const stl = toAsciiStl(triangles, metadata.id);

@@ -1,0 +1,18 @@
+# Open Brick Lab - LLM URL Rules
+
+Base URL:
+https://openbrick.cogan.dev/
+
+When generating a link for a specific brick, use this exact format:
+https://openbrick.cogan.dev/?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}
+
+Parameter ranges:
+- X (width): integer 1..10
+- Y (length): integer 1..12
+- Z (height): integer 1..9
+- SCALE (scale): integer 95..105
+
+Example:
+https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101
+
+If user values are out of range, clamp to nearest valid value.

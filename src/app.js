@@ -7,6 +7,7 @@ import {
   parseTemplateMetadata,
   toAsciiStl,
 } from "./scad-engine.mjs";
+import { buildShareQuery, parseShareQuery } from "./share-query.mjs";
 
 const TEMPLATE_PATHS = ["../scad/classic_brick.scad"];
 
@@ -21,6 +22,7 @@ const elements = {
   templateSelect: document.querySelector("#templateSelect"),
   parameterControls: document.querySelector("#parameterControls"),
   downloadButton: document.querySelector("#downloadButton"),
+  shareButton: document.querySelector("#shareButton"),
   status: document.querySelector("#status"),
   canvas: document.querySelector("#previewCanvas"),
   scadSource: document.querySelector("#scadSource"),
@@ -34,6 +36,7 @@ const state = {
   activeTemplate: null,
   triangles: [],
   params: {},
+  shareResetTimer: null,
   rotation: {
     x: DEFAULT_ROTATION.x,
     y: DEFAULT_ROTATION.y,
@@ -59,6 +62,13 @@ async function init() {
 
   state.templates = templates;
   fillTemplateSelect(templates);
+  const sharedConfig = parseShareQuery(window.location.search, templates);
+  if (sharedConfig) {
+    setActiveTemplate(sharedConfig.templateId, { skipRegenerate: true });
+    applyParamsToControls(sharedConfig.params);
+    regenerate();
+    return;
+  }
   setActiveTemplate(templates[0].id);
 }
 
@@ -69,6 +79,9 @@ function bindEvents() {
 
   elements.downloadButton.addEventListener("click", () => {
     downloadStl();
+  });
+  elements.shareButton.addEventListener("click", () => {
+    copyShareLink();
   });
 
   elements.rotationX.addEventListener("input", () => {
@@ -170,7 +183,7 @@ function fillTemplateSelect(templates) {
   }
 }
 
-function setActiveTemplate(templateId) {
+function setActiveTemplate(templateId, options = {}) {
   const template = state.templates.find((item) => item.id === templateId);
   if (!template) {
     return;
@@ -179,7 +192,31 @@ function setActiveTemplate(templateId) {
   state.activeTemplate = template;
   elements.templateSelect.value = template.id;
   buildParameterControls(template.params);
-  regenerate();
+  if (!options.skipRegenerate) {
+    regenerate();
+  }
+}
+
+function applyParamsToControls(params) {
+  if (!state.activeTemplate) {
+    return;
+  }
+
+  for (const param of state.activeTemplate.params) {
+    const input = elements.parameterControls.querySelector(`[data-param-key="${param.key}"]`);
+    if (!input) {
+      continue;
+    }
+
+    const rawValue = Number(params[param.key]);
+    const value = Number.isFinite(rawValue) ? clamp(rawValue, param.min, param.max) : param.defaultValue;
+    input.value = String(value);
+
+    const output = input.closest(".param")?.querySelector("output");
+    if (output) {
+      output.textContent = formatParamValue(param, value);
+    }
+  }
 }
 
 function buildParameterControls(params) {
@@ -255,6 +292,8 @@ function regenerate() {
     state.params = params;
     state.triangles = triangles;
     elements.downloadButton.disabled = false;
+    elements.shareButton.disabled = false;
+    syncShareQuery();
     if (elements.scadSource) {
       elements.scadSource.textContent = buildResolvedScadSource(state.activeTemplate.source, params);
     }
@@ -265,6 +304,8 @@ function regenerate() {
   } catch (error) {
     state.triangles = [];
     elements.downloadButton.disabled = true;
+    elements.shareButton.disabled = true;
+    resetShareButtonLabel();
     drawEmptyPreview("Geometry Error");
     setStatus(error.message, true);
   }
@@ -444,6 +485,82 @@ function shadeRgb(base, intensity) {
 function setStatus(text, isError = false) {
   elements.status.textContent = text;
   elements.status.classList.toggle("error", isError);
+}
+
+function syncShareQuery() {
+  if (!state.activeTemplate) {
+    return;
+  }
+
+  const nextSearch = buildShareQuery(state.activeTemplate, state.params);
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  if (currentUrl !== nextUrl) {
+    window.history.replaceState(null, "", nextUrl);
+  }
+}
+
+async function copyShareLink() {
+  if (!state.activeTemplate || state.triangles.length === 0) {
+    return;
+  }
+
+  syncShareQuery();
+  const shareUrl = window.location.href;
+
+  try {
+    await copyTextToClipboard(shareUrl);
+    flashShareButtonLabel("Link Copied!");
+  } catch {
+    flashShareButtonLabel("Copy Failed");
+  }
+}
+
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  document.body.append(textArea);
+  textArea.select();
+  textArea.setSelectionRange(0, text.length);
+
+  const copied = document.execCommand("copy");
+  textArea.remove();
+  if (!copied) {
+    throw new Error("Copy failed");
+  }
+}
+
+function flashShareButtonLabel(text) {
+  if (!elements.shareButton) {
+    return;
+  }
+
+  elements.shareButton.textContent = text;
+  if (state.shareResetTimer) {
+    window.clearTimeout(state.shareResetTimer);
+  }
+  state.shareResetTimer = window.setTimeout(() => {
+    resetShareButtonLabel();
+  }, 2000);
+}
+
+function resetShareButtonLabel() {
+  if (!elements.shareButton) {
+    return;
+  }
+  elements.shareButton.textContent = "Share";
+  if (state.shareResetTimer) {
+    window.clearTimeout(state.shareResetTimer);
+    state.shareResetTimer = null;
+  }
 }
 
 function downloadStl() {

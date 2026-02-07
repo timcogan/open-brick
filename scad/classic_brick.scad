@@ -1,8 +1,8 @@
 // @id classic_brick
 // @name Classic Brick
 // @description Classic interlocking brick with top studs and bottom cylindrical female sockets.
-// @param X|Width (studs)|2|10|1|4
-// @param Y|Length (studs)|2|12|1|2
+// @param X|Width (studs)|1|10|1|4
+// @param Y|Length (studs)|1|12|1|2
 // @param Z|Height (plates)|1|9|1|3
 // @param scale_percent|Global Scale (%)|95|105|1|100
 //
@@ -56,8 +56,8 @@ union() {
   }
 
   // Top male studs.
-  for (i = [0:X - 1]) {
-    for (j = [0:Y - 1]) {
+  for (i = [0:1:X - 1]) {
+    for (j = [0:1:Y - 1]) {
       translate([stud_x0 + i * block, stud_y0 + j * block, height]) {
         cylinder(h=hstud, r=dstud / 2, $fn=28);
       }
@@ -65,8 +65,8 @@ union() {
   }
 
   // Bottom female sockets as cylindrical tubes.
-  for (i = [0:X - 2]) {
-    for (j = [0:Y - 2]) {
+  for (i = [0:1:X - 2]) {
+    for (j = [0:1:Y - 2]) {
       cx = tube_x0 + i * block;
       cy = tube_y0 + j * block;
       translate([cx, cy, 0]) {

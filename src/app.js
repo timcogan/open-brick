@@ -133,9 +133,10 @@ function bindCanvasRotation() {
 async function loadTemplates() {
   const responses = await Promise.all(
     TEMPLATE_PATHS.map(async (path) => {
-      const response = await fetch(path);
+      const templateUrl = new URL(path, import.meta.url);
+      const response = await fetch(templateUrl);
       if (!response.ok) {
-        throw new Error(`Unable to load ${path}`);
+        throw new Error(`Unable to load ${templateUrl.pathname}`);
       }
 
       const source = await response.text();

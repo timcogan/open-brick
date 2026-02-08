@@ -3,14 +3,15 @@
 Base URL:
 https://openbrick.cogan.dev/
 
-When generating a link for a specific brick, use this exact format:
+When generating a link for a specific brick, use one of these formats:
 https://openbrick.cogan.dev/?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}
+https://openbrick.cogan.dev/?template=classic_plate&width={X}&length={Y}&scale={SCALE}
+https://openbrick.cogan.dev/?template=classic_tile&width={X}&length={Y}&scale={SCALE}
 
 Parameter ranges:
-- X (width): integer 1..10
-- Y (length): integer 1..12
-- Z (height): integer 1..9
-- SCALE (scale): integer 95..105
+- classic_brick: X 1..10, Y 1..12, Z 1..9, SCALE 95..105
+- classic_plate: X 1..16, Y 1..16, SCALE 95..105
+- classic_tile: X 1..16, Y 1..16, SCALE 95..105
 
 Example:
 https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101

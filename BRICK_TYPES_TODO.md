@@ -3,8 +3,8 @@
 Priority is top-to-bottom (most common/popular first).
 
 - [x] Classic Brick
-- [ ] Plate
-- [ ] Tile
+- [x] Plate
+- [x] Tile
 - [ ] Round Plate / Round Tile
 - [ ] Slope
 - [ ] Round Brick / Cylinder

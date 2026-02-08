@@ -13,6 +13,15 @@ const CLASSIC_TEMPLATE = {
   ],
 };
 
+const TILE_TEMPLATE = {
+  id: "classic_tile",
+  params: [
+    { key: "X", min: 1, max: 16, defaultValue: 2 },
+    { key: "Y", min: 1, max: 16, defaultValue: 4 },
+    { key: "scale_percent", min: 95, max: 105, defaultValue: 100 },
+  ],
+};
+
 test("buildShareQuery writes canonical query params", () => {
   const query = buildShareQuery(CLASSIC_TEMPLATE, {
     X: 6,
@@ -22,6 +31,16 @@ test("buildShareQuery writes canonical query params", () => {
   });
 
   assert.equal(query, "?template=classic_brick&width=6&length=4&height=2&scale=101");
+});
+
+test("buildShareQuery omits height for templates that do not define Z", () => {
+  const query = buildShareQuery(TILE_TEMPLATE, {
+    X: 3,
+    Y: 6,
+    scale_percent: 99,
+  });
+
+  assert.equal(query, "?template=classic_tile&width=3&length=6&scale=99");
 });
 
 test("parseShareQuery reads canonical query params", () => {
@@ -60,6 +79,21 @@ test("parseShareQuery falls back to first template when template is missing", ()
     Y: 3,
     Z: 4,
     scale_percent: 100,
+  });
+});
+
+test("parseShareQuery supports templates without height parameter", () => {
+  const parsed = parseShareQuery("?template=classic_tile&width=7&length=2&scale=102", [
+    CLASSIC_TEMPLATE,
+    TILE_TEMPLATE,
+  ]);
+
+  assert.ok(parsed);
+  assert.equal(parsed.templateId, "classic_tile");
+  assert.deepEqual({ ...parsed.params }, {
+    X: 7,
+    Y: 2,
+    scale_percent: 102,
   });
 });
 

@@ -9,7 +9,23 @@ import {
 } from "./scad-engine.mjs";
 import { buildShareQuery, parseShareQuery } from "./share-query.mjs";
 
-const TEMPLATE_PATHS = ["../scad/classic_brick.scad"];
+const TEMPLATE_CATALOG = [
+  {
+    id: "classic_brick",
+    name: "Classic Brick",
+    path: "../scad/classic_brick.scad",
+  },
+  {
+    id: "classic_plate",
+    name: "Classic Plate",
+    path: "../scad/classic_plate.scad",
+  },
+  {
+    id: "classic_tile",
+    name: "Classic Tile",
+    path: "../scad/classic_tile.scad",
+  },
+];
 
 const DEFAULT_ROTATION = {
   x: degToRad(-52),
@@ -32,8 +48,8 @@ const elements = {
 };
 
 const state = {
-  templates: [],
   activeTemplate: null,
+  templateCache: Object.create(null),
   triangles: [],
   params: {},
   shareResetTimer: null,
@@ -54,27 +70,27 @@ async function init() {
   bindEvents();
   syncRotationControls();
   drawEmptyPreview("Loading...");
+  fillTemplateSelect(TEMPLATE_CATALOG);
 
-  const templates = await loadTemplates();
-  if (templates.length === 0) {
+  const initialTemplateId = resolveInitialTemplateId(window.location.search);
+  await setActiveTemplate(initialTemplateId, { skipRegenerate: true });
+
+  if (!state.activeTemplate) {
     throw new Error("No SCAD templates were loaded.");
   }
 
-  state.templates = templates;
-  fillTemplateSelect(templates);
-  const sharedConfig = parseShareQuery(window.location.search, templates);
+  const sharedConfig = parseShareQuery(window.location.search, [state.activeTemplate]);
   if (sharedConfig) {
-    setActiveTemplate(sharedConfig.templateId, { skipRegenerate: true });
     applyParamsToControls(sharedConfig.params);
-    regenerate();
-    return;
   }
-  setActiveTemplate(templates[0].id);
+  regenerate();
 }
 
 function bindEvents() {
   elements.templateSelect.addEventListener("change", () => {
-    setActiveTemplate(elements.templateSelect.value);
+    setActiveTemplate(elements.templateSelect.value).catch((error) => {
+      setStatus(error.message, true);
+    });
   });
 
   elements.downloadButton.addEventListener("click", () => {
@@ -143,39 +159,9 @@ function bindCanvasRotation() {
   canvas.addEventListener("pointercancel", stopDragging);
 }
 
-async function loadTemplates() {
-  const responses = await Promise.all(
-    TEMPLATE_PATHS.map(async (path) => {
-      const templateUrl = new URL(path, import.meta.url);
-      const response = await fetch(templateUrl);
-      if (!response.ok) {
-        throw new Error(`Unable to load ${templateUrl.pathname}`);
-      }
-
-      const source = await response.text();
-      const fallbackId = path.split("/").pop().replace(".scad", "");
-      const metadata = parseTemplateMetadata(source, fallbackId);
-      const ast = parseScad(source);
-
-      if (metadata.params.length === 0) {
-        throw new Error(`Template has no parameters: ${path}`);
-      }
-
-      return {
-        ...metadata,
-        path,
-        source,
-        ast,
-      };
-    })
-  );
-
-  return responses;
-}
-
-function fillTemplateSelect(templates) {
+function fillTemplateSelect(catalog) {
   elements.templateSelect.innerHTML = "";
-  for (const template of templates) {
+  for (const template of catalog) {
     const option = document.createElement("option");
     option.value = template.id;
     option.textContent = template.name;
@@ -183,11 +169,8 @@ function fillTemplateSelect(templates) {
   }
 }
 
-function setActiveTemplate(templateId, options = {}) {
-  const template = state.templates.find((item) => item.id === templateId);
-  if (!template) {
-    return;
-  }
+async function setActiveTemplate(templateId, options = {}) {
+  const template = await loadTemplateById(templateId);
 
   state.activeTemplate = template;
   elements.templateSelect.value = template.id;
@@ -195,6 +178,74 @@ function setActiveTemplate(templateId, options = {}) {
   if (!options.skipRegenerate) {
     regenerate();
   }
+}
+
+async function loadTemplateById(templateId) {
+  const catalogEntry = findTemplateCatalogEntry(templateId);
+  if (!catalogEntry) {
+    throw new Error(`Unknown template id: ${templateId}`);
+  }
+
+  if (state.templateCache[catalogEntry.id]) {
+    return state.templateCache[catalogEntry.id];
+  }
+
+  const templateUrl = new URL(catalogEntry.path, import.meta.url);
+  const response = await fetch(templateUrl);
+  if (!response.ok) {
+    throw new Error(`Unable to load ${templateUrl.pathname}`);
+  }
+
+  const source = await response.text();
+  const metadata = parseTemplateMetadata(source, catalogEntry.id);
+  const ast = parseScad(source);
+
+  if (metadata.params.length === 0) {
+    throw new Error(`Template has no parameters: ${catalogEntry.path}`);
+  }
+
+  const template = {
+    ...metadata,
+    id: catalogEntry.id,
+    name: metadata.name || catalogEntry.name,
+    path: catalogEntry.path,
+    source,
+    ast,
+  };
+
+  state.templateCache[catalogEntry.id] = template;
+  return template;
+}
+
+function resolveInitialTemplateId(search) {
+  const query = new URLSearchParams(search || "");
+  const templateHint = query.get("template");
+  const catalogEntry = findTemplateCatalogEntry(templateHint);
+  if (catalogEntry) {
+    return catalogEntry.id;
+  }
+  return TEMPLATE_CATALOG[0].id;
+}
+
+function findTemplateCatalogEntry(templateHint) {
+  const normalizedHint = normalizeTemplateHint(templateHint);
+  if (!normalizedHint) {
+    return null;
+  }
+
+  return (
+    TEMPLATE_CATALOG.find((entry) => {
+      const entryId = normalizeTemplateHint(entry.id);
+      return entryId === normalizedHint || entryId.replace(/_/g, "-") === normalizedHint;
+    }) || null
+  );
+}
+
+function normalizeTemplateHint(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return String(value).trim().toLowerCase();
 }
 
 function applyParamsToControls(params) {

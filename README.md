@@ -21,17 +21,21 @@ Brick type roadmap:
 Share a specific brick configuration with:
 
 `https://openbrick.cogan.dev/?template=classic_brick&width=X&length=Y&height=Z&scale=SCALE`
+`https://openbrick.cogan.dev/?template=classic_plate&width=X&length=Y&scale=SCALE`
+`https://openbrick.cogan.dev/?template=classic_tile&width=X&length=Y&scale=SCALE`
 
 Where:
-- `template`: currently `classic_brick`
-- `width`: studs in X (1-10)
-- `length`: studs in Y (1-12)
-- `height`: plate units in Z (1-9)
+- `template`: `classic_brick`, `classic_plate`, or `classic_tile`
+- `width`: studs in X (`classic_brick`: 1-10, `classic_plate`/`classic_tile`: 1-16)
+- `length`: studs in Y (`classic_brick`: 1-12, `classic_plate`/`classic_tile`: 1-16)
+- `height`: plate units in Z (only for `classic_brick`, 1-9)
 - `scale`: global scale percent (95-105)
 
 Example:
 
 `https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101`
+`https://openbrick.cogan.dev/?template=classic_plate&width=2&length=4&scale=100`
+`https://openbrick.cogan.dev/?template=classic_tile&width=2&length=4&scale=100`
 
 Notes:
 - Opening that URL preloads the sliders with those values.
@@ -40,7 +44,7 @@ Notes:
 - `1x1` bricks are supported (`width=1&length=1`).
 
 ## What You Can Do
-- Choose a classic brick template.
+- Choose a template (brick, plate, or tile).
 - Adjust brick dimensions and global scale.
 - Preview the model in 3D directly in the browser.
 - Download the result as an STL file.

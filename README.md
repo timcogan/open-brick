@@ -21,7 +21,9 @@ Brick type roadmap:
 Share a specific brick configuration with:
 
 `https://openbrick.cogan.dev/?template=classic_brick&width=X&length=Y&height=Z&scale=SCALE`
+
 `https://openbrick.cogan.dev/?template=classic_plate&width=X&length=Y&scale=SCALE`
+
 `https://openbrick.cogan.dev/?template=classic_tile&width=X&length=Y&scale=SCALE`
 
 Where:
@@ -34,7 +36,9 @@ Where:
 Example:
 
 `https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101`
+
 `https://openbrick.cogan.dev/?template=classic_plate&width=2&length=4&scale=100`
+
 `https://openbrick.cogan.dev/?template=classic_tile&width=2&length=4&scale=100`
 
 Notes:

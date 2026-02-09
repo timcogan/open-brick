@@ -53,6 +53,10 @@ code {
   align-self: start;
 }
 
+.controls-head {
+  text-align: center;
+}
+
 .preview {
   position: relative;
   padding: 0.8rem;
@@ -61,12 +65,39 @@ code {
 }
 
 .eyebrow {
-  margin: 0 0 0.35rem;
+  margin: 0;
   color: var(--accent);
   letter-spacing: 0.12em;
   font-size: 0.73rem;
   text-transform: uppercase;
   font-weight: 700;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  flex: 0 0 auto;
+  position: absolute;
+  right: 0;
+}
+
+.repo-link img {
+  display: block;
+  height: 22px;
+  width: auto;
 }
 
 h1 {
@@ -74,12 +105,15 @@ h1 {
   font-size: 2rem;
   line-height: 1.05;
   font-weight: 800;
+  text-align: left;
 }
 
 .intro {
-  margin: 0.65rem 0 1.1rem;
+  margin: 0.9rem 0 1.1rem;
   color: var(--muted);
   line-height: 1.4;
+  max-width: none;
+  text-align: left;
 }
 
 .field {
@@ -180,6 +214,7 @@ button:disabled {
   font-size: 0.9rem;
   color: #c3d2e3;
   min-height: 1.2rem;
+  text-align: center;
 }
 
 .status.error {
@@ -196,15 +231,37 @@ button:disabled {
   touch-action: none;
 }
 
+.preview-canvas-wrap {
+  position: relative;
+}
+
+.icon-button {
+  position: absolute;
+  bottom: 1rem;
+  right: 0.65rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 999px;
+  color: #d6e2f0;
+  background: rgba(39, 56, 78, 0.78);
+  border: 1px solid #3a526e;
+  backdrop-filter: blur(2px);
+}
+
+.icon-button:hover {
+  background: rgba(50, 75, 104, 0.9);
+}
+
 .hint {
-  margin: 0.55rem 0 0.5rem;
+  margin: 0.55rem 0 0.8rem;
   color: #afc4d7;
   font-size: 0.88rem;
 }
 
 .view-controls {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 0.6rem;
   align-items: end;
   margin-bottom: 0.7rem;
@@ -262,6 +319,14 @@ button:disabled {
 }
 
 @media (max-width: 620px) {
+  .repo-link {
+    position: static;
+  }
+
+  .eyebrow-row {
+    justify-content: space-between;
+  }
+
   .view-controls {
     grid-template-columns: 1fr;
   }

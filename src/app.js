@@ -539,9 +539,7 @@ function regenerate() {
     if (elements.scadSource) {
       elements.scadSource.textContent = buildResolvedScadSource(state.activeTemplate.source, params);
     }
-    setStatus(
-      `${state.activeTemplate.name}: ${triangles.length} triangles ready for export. ${state.activeTemplate.description}`
-    );
+    setStatus(`${state.activeTemplate.name}: ${triangles.length} triangles ready for export.`);
     renderPreview();
   } catch (error) {
     state.triangles = [];

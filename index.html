@@ -3,18 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Open Brick Lab</title>
+    <title>Open Brick</title>
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
     <main class="layout">
       <section class="panel controls">
-        <p class="eyebrow">Browser + OpenSCAD subset</p>
-        <h1>Open Brick Lab</h1>
-        <p class="intro">
-          Pick a brick template, tune parameters, preview the result, and export an STL generated fully in your
-          browser from a <code>.scad</code> source file.
-        </p>
+        <div class="controls-head">
+          <div class="eyebrow-row">
+            <p class="eyebrow">OPENSCAD SUBSET</p>
+            <a
+              class="repo-link"
+              href="https://github.com/timcogan/open-brick"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open the Open Brick repository on GitHub"
+            >
+              <img
+                src="https://img.shields.io/badge/GitHub-Repo-181717?logo=github"
+                alt="GitHub: timcogan/open-brick"
+              />
+            </a>
+          </div>
+          <h1>Open Brick</h1>
+          <p class="intro">
+            Pick a brick template, tune parameters, preview the result, and export an STL generated fully in your
+            browser from a <code>.scad</code> source file.
+          </p>
+        </div>
 
         <label class="field" for="templateSelect">
           Brick type
@@ -32,7 +48,12 @@
       </section>
 
       <section class="panel preview">
-        <canvas id="previewCanvas" width="920" height="640"></canvas>
+        <div class="preview-canvas-wrap">
+          <canvas id="previewCanvas" width="920" height="640"></canvas>
+          <button id="resetViewButton" class="icon-button" type="button" aria-label="Reset view" title="Reset view">
+            ↻
+          </button>
+        </div>
         <p class="hint">Drag to rotate, or use the sliders for easier control.</p>
 
         <div class="view-controls">
@@ -45,8 +66,6 @@
             Yaw
             <input id="rotationY" type="range" min="-180" max="180" step="1" value="46" />
           </label>
-
-          <button id="resetViewButton" class="secondary" type="button">Reset View</button>
         </div>
 
         <details class="scad-box">
@@ -56,6 +75,6 @@
       </section>
     </main>
 
-    <script type="module" src="./src/app.js?v=20260208a"></script>
+    <script type="module" src="./src/app.js?v=20260208b"></script>
   </body>
 </html>

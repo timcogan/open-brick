@@ -33,6 +33,50 @@ const DEFAULT_ROTATION = {
 };
 
 const BRICK_COLOR_HEX = "#ffffff";
+const BACKDROP_TOP = [0.047, 0.078, 0.125];
+const BACKDROP_BOTTOM = [0.027, 0.043, 0.071];
+
+const VERTEX_SHADER_SOURCE = `
+attribute vec3 aPosition;
+attribute vec3 aNormal;
+
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+
+varying vec3 vNormal;
+varying vec3 vViewPos;
+
+void main() {
+  vec4 worldPos = uModel * vec4(aPosition, 1.0);
+  vec4 viewPos = uView * worldPos;
+  gl_Position = uProjection * viewPos;
+  vNormal = mat3(uModel) * aNormal;
+  vViewPos = viewPos.xyz;
+}
+`;
+
+const FRAGMENT_SHADER_SOURCE = `
+precision mediump float;
+
+varying vec3 vNormal;
+varying vec3 vViewPos;
+
+uniform vec3 uColor;
+uniform vec3 uLightDir;
+
+void main() {
+  vec3 normal = normalize(vNormal);
+  vec3 lightDir = normalize(uLightDir);
+  vec3 viewDir = normalize(-vViewPos);
+  float diffuse = max(dot(normal, lightDir), 0.0);
+  vec3 halfVec = normalize(lightDir + viewDir);
+  float specular = pow(max(dot(normal, halfVec), 0.0), 28.0) * 0.18;
+  float shade = 0.24 + diffuse * 0.76;
+  vec3 color = uColor * shade + vec3(specular);
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
 
 const elements = {
   templateSelect: document.querySelector("#templateSelect"),
@@ -51,7 +95,9 @@ const state = {
   activeTemplate: null,
   templateCache: Object.create(null),
   triangles: [],
+  mesh: null,
   params: {},
+  renderer: null,
   shareResetTimer: null,
   rotation: {
     x: DEFAULT_ROTATION.x,
@@ -67,6 +113,7 @@ const state = {
 init().catch((error) => setStatus(error.message, true));
 
 async function init() {
+  state.renderer = createPreviewRenderer(elements.canvas);
   bindEvents();
   syncRotationControls();
   drawEmptyPreview("Loading...");
@@ -157,6 +204,143 @@ function bindCanvasRotation() {
 
   canvas.addEventListener("pointerup", stopDragging);
   canvas.addEventListener("pointercancel", stopDragging);
+}
+
+function createPreviewRenderer(canvas) {
+  const gl =
+    canvas.getContext("webgl", { antialias: true, alpha: false, depth: true, stencil: false, preserveDrawingBuffer: false }) ||
+    canvas.getContext("experimental-webgl");
+  if (!gl) {
+    return { kind: "2d" };
+  }
+
+  const program = createWebglProgram(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+  const positionBuffer = gl.createBuffer();
+  const normalBuffer = gl.createBuffer();
+  if (!program || !positionBuffer || !normalBuffer) {
+    return {
+      kind: "webgl",
+      gl,
+      program: null,
+      positionBuffer: null,
+      normalBuffer: null,
+      attributes: { position: -1, normal: -1 },
+      uniforms: { model: null, view: null, projection: null, color: null, lightDir: null },
+    };
+  }
+
+  const renderer = {
+    kind: "webgl",
+    gl,
+    program,
+    positionBuffer,
+    normalBuffer,
+    attributes: {
+      position: gl.getAttribLocation(program, "aPosition"),
+      normal: gl.getAttribLocation(program, "aNormal"),
+    },
+    uniforms: {
+      model: gl.getUniformLocation(program, "uModel"),
+      view: gl.getUniformLocation(program, "uView"),
+      projection: gl.getUniformLocation(program, "uProjection"),
+      color: gl.getUniformLocation(program, "uColor"),
+      lightDir: gl.getUniformLocation(program, "uLightDir"),
+    },
+  };
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.disable(gl.BLEND);
+
+  return renderer;
+}
+
+function buildRenderMesh(triangles) {
+  const bounds = computeBounds(triangles);
+  if (!bounds) {
+    return null;
+  }
+
+  const vertexCount = triangles.length * 3;
+  const positions = new Float32Array(vertexCount * 3);
+  const normals = new Float32Array(vertexCount * 3);
+  let writeOffset = 0;
+
+  for (const triangle of triangles) {
+    const normal = computeNormal(triangle);
+    for (const point of triangle) {
+      positions[writeOffset] = point[0] - bounds.center[0];
+      positions[writeOffset + 1] = point[1] - bounds.center[1];
+      positions[writeOffset + 2] = point[2] - bounds.center[2];
+
+      normals[writeOffset] = normal[0];
+      normals[writeOffset + 1] = normal[1];
+      normals[writeOffset + 2] = normal[2];
+      writeOffset += 3;
+    }
+  }
+
+  return {
+    positions,
+    normals,
+    vertexCount,
+    maxSize: Math.max(1, ...bounds.size),
+  };
+}
+
+function uploadMeshToRenderer(mesh) {
+  const renderer = state.renderer;
+  if (!renderer || renderer.kind !== "webgl" || !renderer.program || !renderer.positionBuffer || !renderer.normalBuffer) {
+    return;
+  }
+
+  const { gl } = renderer;
+  gl.bindBuffer(gl.ARRAY_BUFFER, renderer.positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, mesh.positions, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, renderer.normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, mesh.normals, gl.DYNAMIC_DRAW);
+}
+
+function createWebglProgram(gl, vertexSource, fragmentSource) {
+  const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+  if (!vertexShader || !fragmentShader) {
+    return null;
+  }
+
+  const program = gl.createProgram();
+  if (!program) {
+    return null;
+  }
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+
+  gl.deleteShader(vertexShader);
+  gl.deleteShader(fragmentShader);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    gl.deleteProgram(program);
+    return null;
+  }
+
+  return program;
+}
+
+function compileShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  if (!shader) {
+    return null;
+  }
+
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    gl.deleteShader(shader);
+    return null;
+  }
+
+  return shader;
 }
 
 function fillTemplateSelect(catalog) {
@@ -340,8 +524,15 @@ function regenerate() {
       throw new Error("Generated geometry is empty.");
     }
 
+    const mesh = buildRenderMesh(triangles);
+    if (!mesh) {
+      throw new Error("Unable to prepare preview mesh.");
+    }
+
     state.params = params;
     state.triangles = triangles;
+    state.mesh = mesh;
+    uploadMeshToRenderer(mesh);
     elements.downloadButton.disabled = false;
     elements.shareButton.disabled = false;
     syncShareQuery();
@@ -354,6 +545,7 @@ function regenerate() {
     renderPreview();
   } catch (error) {
     state.triangles = [];
+    state.mesh = null;
     elements.downloadButton.disabled = true;
     elements.shareButton.disabled = true;
     resetShareButtonLabel();
@@ -363,13 +555,67 @@ function regenerate() {
 }
 
 function renderPreview() {
-  if (state.triangles.length === 0) {
+  if (!state.mesh || state.triangles.length === 0) {
     drawEmptyPreview("No mesh");
     return;
   }
 
+  if (state.renderer && state.renderer.kind === "webgl") {
+    renderPreviewWebgl(state.renderer, state.mesh);
+  } else {
+    renderPreview2d();
+  }
+}
+
+function renderPreviewWebgl(renderer, mesh) {
+  const { gl } = renderer;
+  const canvas = elements.canvas;
+  resizeCanvas(canvas);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  gl.clearColor(BACKDROP_BOTTOM[0], BACKDROP_BOTTOM[1], BACKDROP_BOTTOM[2], 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  if (!renderer.program || !renderer.positionBuffer || !renderer.normalBuffer || mesh.vertexCount === 0) {
+    return;
+  }
+
+  gl.useProgram(renderer.program);
+
+  const aspect = canvas.width / Math.max(1, canvas.height);
+  const maxSize = Math.max(1, mesh.maxSize);
+  const cameraDistance = maxSize * 3.6 + 36;
+  const projection = createPerspectiveMatrix(degToRad(46), aspect, 1, cameraDistance + maxSize * 10 + 160);
+  const view = createTranslationMatrix(0, 0, -cameraDistance);
+  const rotationZ = createRotationZMatrix(state.rotation.y);
+  const rotationX = createRotationXMatrix(state.rotation.x);
+  const model = multiplyMatrices(rotationX, rotationZ);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, renderer.positionBuffer);
+  gl.enableVertexAttribArray(renderer.attributes.position);
+  gl.vertexAttribPointer(renderer.attributes.position, 3, gl.FLOAT, false, 0, 0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, renderer.normalBuffer);
+  gl.enableVertexAttribArray(renderer.attributes.normal);
+  gl.vertexAttribPointer(renderer.attributes.normal, 3, gl.FLOAT, false, 0, 0);
+
+  const color = getBrickColor();
+  const light = normalize([0.35, -0.5, 0.8]);
+  gl.uniformMatrix4fv(renderer.uniforms.model, false, model);
+  gl.uniformMatrix4fv(renderer.uniforms.view, false, view);
+  gl.uniformMatrix4fv(renderer.uniforms.projection, false, projection);
+  gl.uniform3f(renderer.uniforms.color, color.r / 255, color.g / 255, color.b / 255);
+  gl.uniform3f(renderer.uniforms.lightDir, light[0], light[1], light[2]);
+
+  gl.drawArrays(gl.TRIANGLES, 0, mesh.vertexCount);
+}
+
+function renderPreview2d() {
   const canvas = elements.canvas;
   const context = canvas.getContext("2d");
+  if (!context) {
+    return;
+  }
   resizeCanvas(canvas);
 
   const width = canvas.width;
@@ -441,6 +687,9 @@ function renderPreview() {
 }
 
 function drawBackdrop(context, width, height) {
+  if (!context) {
+    return;
+  }
   const gradient = context.createLinearGradient(0, 0, 0, height);
   gradient.addColorStop(0, "#0c1420");
   gradient.addColorStop(1, "#070b12");
@@ -450,8 +699,20 @@ function drawBackdrop(context, width, height) {
 
 function drawEmptyPreview(text) {
   const canvas = elements.canvas;
-  const context = canvas.getContext("2d");
   resizeCanvas(canvas);
+  if (state.renderer && state.renderer.kind === "webgl") {
+    const { gl } = state.renderer;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(BACKDROP_TOP[0], BACKDROP_TOP[1], BACKDROP_TOP[2], 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    return;
+  }
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return;
+  }
+
   const width = canvas.width;
   const height = canvas.height;
   drawBackdrop(context, width, height);
@@ -462,7 +723,9 @@ function drawEmptyPreview(text) {
 }
 
 function resizeCanvas(canvas) {
-  const ratio = window.devicePixelRatio || 1;
+  const rawRatio = window.devicePixelRatio || 1;
+  const maxRatio = state.renderer && state.renderer.kind === "webgl" ? 1.5 : 2;
+  const ratio = Math.min(rawRatio, maxRatio);
   const displayWidth = Math.max(1, Math.round(canvas.clientWidth * ratio));
   const displayHeight = Math.max(1, Math.round(canvas.clientHeight * ratio));
 
@@ -489,6 +752,74 @@ function transformPoint(point, center, rotation) {
   const z2 = y1 * sinX + z1 * cosX;
 
   return [x1, y2, z2];
+}
+
+function createPerspectiveMatrix(fovY, aspect, near, far) {
+  const f = 1 / Math.tan(fovY / 2);
+  const nf = 1 / (near - far);
+  return new Float32Array([
+    f / aspect,
+    0,
+    0,
+    0,
+    0,
+    f,
+    0,
+    0,
+    0,
+    0,
+    (far + near) * nf,
+    -1,
+    0,
+    0,
+    2 * far * near * nf,
+    0,
+  ]);
+}
+
+function createTranslationMatrix(x, y, z) {
+  return new Float32Array([
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    x, y, z, 1,
+  ]);
+}
+
+function createRotationZMatrix(angle) {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return new Float32Array([
+    cos, sin, 0, 0,
+    -sin, cos, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+  ]);
+}
+
+function createRotationXMatrix(angle) {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return new Float32Array([
+    1, 0, 0, 0,
+    0, cos, sin, 0,
+    0, -sin, cos, 0,
+    0, 0, 0, 1,
+  ]);
+}
+
+function multiplyMatrices(a, b) {
+  const out = new Float32Array(16);
+  for (let column = 0; column < 4; column += 1) {
+    for (let row = 0; row < 4; row += 1) {
+      out[column * 4 + row] =
+        a[0 * 4 + row] * b[column * 4 + 0] +
+        a[1 * 4 + row] * b[column * 4 + 1] +
+        a[2 * 4 + row] * b[column * 4 + 2] +
+        a[3 * 4 + row] * b[column * 4 + 3];
+    }
+  }
+  return out;
 }
 
 function dot(a, b) {

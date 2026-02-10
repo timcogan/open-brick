@@ -88,16 +88,27 @@ code {
 .repo-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   line-height: 0;
   flex: 0 0 auto;
   position: absolute;
   right: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid #3a526e;
+  background: rgba(39, 56, 78, 0.78);
+  transition: background 120ms ease-in;
+}
+
+.repo-link:hover {
+  background: rgba(50, 75, 104, 0.9);
 }
 
 .repo-link img {
   display: block;
-  height: 22px;
-  width: auto;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 h1 {
@@ -106,6 +117,19 @@ h1 {
   line-height: 1.05;
   font-weight: 800;
   text-align: left;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo {
+  display: block;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: 0 0 auto;
 }
 
 .intro {

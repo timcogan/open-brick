@@ -3,7 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Open Brick</title>
+    <link rel="icon" type="image/svg+xml" href="./src/logo.svg" />
+    <title>Open Brick | Parametric Brick STL Generator for 3D Printing</title>
+    <meta
+      name="description"
+      content="Open Brick is a browser-based parametric brick generator. Create classic brick, plate, and tile STL files for 3D printing from OpenSCAD templates."
+    />
+    <meta
+      name="keywords"
+      content="brick STL generator, parametric brick, OpenSCAD, 3D printing, classic brick, classic plate, classic tile"
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="theme-color" content="#0b1424" />
+    <link rel="canonical" href="https://openbrick.cogan.dev/" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM quick rules" />
+    <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM full context" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Open Brick" />
+    <meta property="og:title" content="Open Brick | Parametric Brick STL Generator for 3D Printing" />
+    <meta
+      property="og:description"
+      content="Generate classic interlocking brick STL files in the browser. Configure width, length, height, and scale, then export for 3D printing."
+    />
+    <meta property="og:url" content="https://openbrick.cogan.dev/" />
+    <meta property="og:image" content="https://openbrick.cogan.dev/src/logo.svg" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Open Brick | Parametric Brick STL Generator for 3D Printing" />
+    <meta
+      name="twitter:description"
+      content="Browser-based brick, plate, and tile STL generator powered by OpenSCAD templates."
+    />
+    <meta name="twitter:image" content="https://openbrick.cogan.dev/src/logo.svg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Open Brick",
+        "url": "https://openbrick.cogan.dev/",
+        "image": "https://openbrick.cogan.dev/src/logo.svg",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Any",
+        "isAccessibleForFree": true,
+        "description": "Browser-based parametric brick generator that exports STL files for 3D printing.",
+        "codeRepository": "https://github.com/timcogan/open-brick",
+        "license": "https://github.com/timcogan/open-brick/blob/master/LICENSE",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
@@ -19,13 +72,13 @@
               rel="noopener noreferrer"
               aria-label="Open the Open Brick repository on GitHub"
             >
-              <img
-                src="https://img.shields.io/badge/GitHub-Repo-181717?logo=github"
-                alt="GitHub: timcogan/open-brick"
-              />
+              <img src="./src/github.svg" alt="" aria-hidden="true" />
             </a>
           </div>
-          <h1>Open Brick</h1>
+          <div class="brand-row">
+            <img class="brand-logo" src="./src/logo.svg" alt="" aria-hidden="true" />
+            <h1>Open Brick</h1>
+          </div>
           <p class="intro">
             Pick a brick template, tune parameters, preview the result, and export an STL generated fully in your
             browser from a <code>.scad</code> source file.

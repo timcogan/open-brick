@@ -1,0 +1,7 @@
+# Open Brick - LLM Discovery
+
+Primary:
+- https://openbrick.cogan.dev/llms.txt
+
+Full context:
+- https://openbrick.cogan.dev/llms-full.txt

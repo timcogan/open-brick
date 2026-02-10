@@ -1,19 +1,27 @@
-# Open Brick Lab - LLM URL Rules
+# Open Brick - LLM Quick Rules
 
-Base URL:
-https://openbrick.cogan.dev/
+Project:
+- App: https://openbrick.cogan.dev/
+- Repo: https://github.com/timcogan/open-brick
+- Full LLM doc: https://openbrick.cogan.dev/llms-full.txt
 
-When generating a link for a specific brick, use one of these formats:
-https://openbrick.cogan.dev/?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}
-https://openbrick.cogan.dev/?template=classic_plate&width={X}&length={Y}&scale={SCALE}
-https://openbrick.cogan.dev/?template=classic_tile&width={X}&length={Y}&scale={SCALE}
+Purpose:
+- Generate shareable URLs for parametric brick STL configurations.
 
-Parameter ranges:
-- classic_brick: X 1..10, Y 1..12, Z 1..9, SCALE 95..105
-- classic_plate: X 1..16, Y 1..16, SCALE 95..105
-- classic_tile: X 1..16, Y 1..16, SCALE 95..105
+Canonical URL shapes:
+- https://openbrick.cogan.dev/?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}
+- https://openbrick.cogan.dev/?template=classic_plate&width={X}&length={Y}&scale={SCALE}
+- https://openbrick.cogan.dev/?template=classic_tile&width={X}&length={Y}&scale={SCALE}
+
+Allowed ranges:
+- classic_brick: width 1..10, length 1..12, height 1..9, scale 95..105
+- classic_plate: width 1..16, length 1..16, scale 95..105
+- classic_tile: width 1..16, length 1..16, scale 95..105
+
+Rules:
+- Clamp out-of-range numeric values to nearest valid value.
+- `height` is only valid for `classic_brick`.
+- Query aliases accepted: `x` -> `width`, `y` -> `length`, `z` -> `height`.
 
 Example:
-https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101
-
-If user values are out of range, clamp to nearest valid value.
+- https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101

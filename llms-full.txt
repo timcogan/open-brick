@@ -15,27 +15,32 @@ Supported templates:
 - `classic_brick`: classic brick with studs and underside sockets
 - `classic_plate`: thin plate with studs
 - `classic_tile`: smooth tile without top studs
+- `mechanical_axle`: cross-shaped mechanical axle
 
 Query API (share links):
 - Base: `https://openbrick.cogan.dev/`
 - Brick: `?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}`
 - Plate: `?template=classic_plate&width={X}&length={Y}&scale={SCALE}`
 - Tile: `?template=classic_tile&width={X}&length={Y}&scale={SCALE}`
+- Mechanical Axle: `?template=mechanical_axle&l={L}&scale={SCALE}`
 
 Range constraints:
-- `classic_brick`: width 1..10, length 1..12, height 1..9, scale 95..105
-- `classic_plate`: width 1..16, length 1..16, scale 95..105
-- `classic_tile`: width 1..16, length 1..16, scale 95..105
+- `classic_brick`: width 1..10, length 1..12, height 1..9, scale 90..110
+- `classic_plate`: width 1..16, length 1..16, scale 90..110
+- `classic_tile`: width 1..16, length 1..16, scale 90..110
+- `mechanical_axle`: l 1..16, scale 90..110
 
 Normalization rules:
 - Clamp out-of-range values to nearest valid bound.
-- Ignore/omit `height` for `classic_plate` and `classic_tile`.
+- Ignore/omit `height` for `classic_plate`, `classic_tile`, and `mechanical_axle`.
+- Use `l` for mechanical axle length.
 - Aliases accepted: `x` for width, `y` for length, `z` for height.
 
 Examples:
 - `https://openbrick.cogan.dev/?template=classic_brick&width=2&length=4&height=3&scale=100`
 - `https://openbrick.cogan.dev/?template=classic_plate&width=2&length=4&scale=100`
 - `https://openbrick.cogan.dev/?template=classic_tile&width=2&length=4&scale=100`
+- `https://openbrick.cogan.dev/?template=mechanical_axle&l=6&scale=100`
 
 When assisting users:
 - Prefer canonical query names: `width`, `length`, `height`, `scale`.

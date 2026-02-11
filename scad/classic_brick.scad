@@ -4,7 +4,7 @@
 // @param X|Width (studs)|1|10|1|4
 // @param Y|Length (studs)|1|12|1|2
 // @param Z|Height (plates)|1|9|1|3
-// @param scale_percent|Global Scale (%)|95|105|1|100
+// @param scale_percent|Global Scale (%)|90|110|1|100
 //
 // Reference proportions:
 // - block pitch = 8.0mm

@@ -37,12 +37,15 @@ Share a specific brick configuration with:
 
 `https://openbrick.cogan.dev/?template=classic_tile&width=X&length=Y&scale=SCALE`
 
+`https://openbrick.cogan.dev/?template=mechanical_axle&l=L&scale=SCALE`
+
 Where:
-- `template`: `classic_brick`, `classic_plate`, or `classic_tile`
+- `template`: `classic_brick`, `classic_plate`, `classic_tile`, or `mechanical_axle`
 - `width`: studs in X (`classic_brick`: 1-10, `classic_plate`/`classic_tile`: 1-16)
 - `length`: studs in Y (`classic_brick`: 1-12, `classic_plate`/`classic_tile`: 1-16)
-- `height`: plate units in Z (only for `classic_brick`, 1-9)
-- `scale`: global scale percent (95-105)
+- `height`: plate units in Z (`classic_brick`: 1-9)
+- `l`: axle length (`mechanical_axle`: 1-16)
+- `scale`: global scale percent (90-110)
 
 Example:
 
@@ -51,6 +54,8 @@ Example:
 `https://openbrick.cogan.dev/?template=classic_plate&width=2&length=4&scale=100`
 
 `https://openbrick.cogan.dev/?template=classic_tile&width=2&length=4&scale=100`
+
+`https://openbrick.cogan.dev/?template=mechanical_axle&l=6&scale=100`
 
 Notes:
 - Opening that URL preloads the sliders with those values.
@@ -72,11 +77,18 @@ Start with `scale=100`. If parts are too tight, try `99` or `98`. If too loose, 
 ### Can I share an exact configuration?
 Yes. Copy the URL after adjusting controls. The query string stores the full brick settings.
 
+### How do I make a mechanical axle STL?
+Open:
+
+`https://openbrick.cogan.dev/?template=mechanical_axle&l=6&scale=100`
+
+Then click `Download STL`.
+
 ### Does it support 1x1 pieces?
-Yes, `width=1&length=1` is valid for all current templates.
+Yes. `width=1&length=1` is valid for brick/plate/tile, and `l=1` for mechanical axle.
 
 ## What You Can Do
-- Choose a template (brick, plate, or tile).
+- Choose a template (brick, plate, tile, or mechanical axle).
 - Adjust brick dimensions and global scale.
 - Preview the model in 3D directly in the browser.
 - Download the result as an STL file.

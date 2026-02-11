@@ -3,7 +3,7 @@
 // @description Smooth low-profile tile without top studs and with bottom female sockets.
 // @param X|Width (studs)|1|16|1|2
 // @param Y|Length (studs)|1|16|1|4
-// @param scale_percent|Global Scale (%)|95|105|1|100
+// @param scale_percent|Global Scale (%)|90|110|1|100
 //
 // Reference proportions:
 // - block pitch = 8.0mm

@@ -12,16 +12,20 @@ Canonical URL shapes:
 - https://openbrick.cogan.dev/?template=classic_brick&width={X}&length={Y}&height={Z}&scale={SCALE}
 - https://openbrick.cogan.dev/?template=classic_plate&width={X}&length={Y}&scale={SCALE}
 - https://openbrick.cogan.dev/?template=classic_tile&width={X}&length={Y}&scale={SCALE}
+- https://openbrick.cogan.dev/?template=mechanical_axle&l={L}&scale={SCALE}
 
 Allowed ranges:
-- classic_brick: width 1..10, length 1..12, height 1..9, scale 95..105
-- classic_plate: width 1..16, length 1..16, scale 95..105
-- classic_tile: width 1..16, length 1..16, scale 95..105
+- classic_brick: width 1..10, length 1..12, height 1..9, scale 90..110
+- classic_plate: width 1..16, length 1..16, scale 90..110
+- classic_tile: width 1..16, length 1..16, scale 90..110
+- mechanical_axle: l 1..16, scale 90..110
 
 Rules:
 - Clamp out-of-range numeric values to nearest valid value.
-- `height` is only valid for `classic_brick`.
+- `height` is valid for `classic_brick`.
+- `l` is used for `mechanical_axle`.
 - Query aliases accepted: `x` -> `width`, `y` -> `length`, `z` -> `height`.
 
 Example:
 - https://openbrick.cogan.dev/?template=classic_brick&width=4&length=2&height=3&scale=101
+- https://openbrick.cogan.dev/?template=mechanical_axle&l=6&scale=100

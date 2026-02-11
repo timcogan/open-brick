@@ -1,18 +1,20 @@
 # Brick Types TODO
 
-Priority is top-to-bottom (most common/popular first).
+Priority is top-to-bottom
 
 - [x] Classic Brick
 - [x] Plate
 - [x] Tile
-- [ ] Round Plate / Round Tile
+- [x] Mechanical Axle
+- [ ] Round Tile
+- [ ] Round Plate
+- [ ] Round Brick
+- [ ] Cylinder
 - [ ] Slope
-- [ ] Round Brick / Cylinder
 - [ ] Curved Slope / Curved Brick
 - [ ] Bracket / Side-Stud Brick
 - [ ] Mechanical Pin
 - [ ] Mechanical Beam
-- [ ] Mechanical Axle
 - [ ] Mechanical Connector
 - [ ] Wedge
 - [ ] Hinge

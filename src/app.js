@@ -25,6 +25,11 @@ const TEMPLATE_CATALOG = [
     name: "Classic Tile",
     path: "../scad/classic_tile.scad",
   },
+  {
+    id: "mechanical_axle",
+    name: "Mechanical Axle",
+    path: "../scad/mechanical_axle.scad",
+  },
 ];
 
 const DEFAULT_ROTATION = {

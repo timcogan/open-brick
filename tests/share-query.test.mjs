@@ -9,7 +9,7 @@ const CLASSIC_TEMPLATE = {
     { key: "X", min: 1, max: 10, defaultValue: 4 },
     { key: "Y", min: 1, max: 12, defaultValue: 2 },
     { key: "Z", min: 1, max: 9, defaultValue: 3 },
-    { key: "scale_percent", min: 95, max: 105, defaultValue: 100 },
+    { key: "scale_percent", min: 90, max: 110, defaultValue: 100 },
   ],
 };
 
@@ -18,7 +18,15 @@ const TILE_TEMPLATE = {
   params: [
     { key: "X", min: 1, max: 16, defaultValue: 2 },
     { key: "Y", min: 1, max: 16, defaultValue: 4 },
-    { key: "scale_percent", min: 95, max: 105, defaultValue: 100 },
+    { key: "scale_percent", min: 90, max: 110, defaultValue: 100 },
+  ],
+};
+
+const MECHANICAL_AXLE_TEMPLATE = {
+  id: "mechanical_axle",
+  params: [
+    { key: "L", min: 1, max: 16, defaultValue: 4 },
+    { key: "scale_percent", min: 90, max: 110, defaultValue: 100 },
   ],
 };
 
@@ -43,6 +51,15 @@ test("buildShareQuery omits height for templates that do not define Z", () => {
   assert.equal(query, "?template=classic_tile&width=3&length=6&scale=99");
 });
 
+test("buildShareQuery writes l for mechanical axle templates", () => {
+  const query = buildShareQuery(MECHANICAL_AXLE_TEMPLATE, {
+    L: 6,
+    scale_percent: 99,
+  });
+
+  assert.equal(query, "?template=mechanical_axle&l=6&scale=99");
+});
+
 test("parseShareQuery reads canonical query params", () => {
   const parsed = parseShareQuery("?template=classic_brick&width=4&length=2&height=3&scale=101", [CLASSIC_TEMPLATE]);
 
@@ -65,7 +82,7 @@ test("parseShareQuery supports aliases and clamps values", () => {
     X: 10,
     Y: 1,
     Z: 9,
-    scale_percent: 105,
+    scale_percent: 110,
   });
 });
 
@@ -97,6 +114,17 @@ test("parseShareQuery supports templates without height parameter", () => {
   });
 });
 
+test("parseShareQuery supports mechanical axle l param", () => {
+  const parsed = parseShareQuery("?template=mechanical_axle&l=8&scale=98", [CLASSIC_TEMPLATE, MECHANICAL_AXLE_TEMPLATE]);
+
+  assert.ok(parsed);
+  assert.equal(parsed.templateId, "mechanical_axle");
+  assert.deepEqual({ ...parsed.params }, {
+    L: 8,
+    scale_percent: 98,
+  });
+});
+
 test("parseShareQuery returns null when there are no relevant query params", () => {
   const parsed = parseShareQuery("?foo=bar", [CLASSIC_TEMPLATE]);
   assert.equal(parsed, null);
@@ -106,6 +134,7 @@ test("getCanonicalQueryName maps known keys", () => {
   assert.equal(getCanonicalQueryName("X"), "width");
   assert.equal(getCanonicalQueryName("Y"), "length");
   assert.equal(getCanonicalQueryName("Z"), "height");
+  assert.equal(getCanonicalQueryName("D"), "d");
   assert.equal(getCanonicalQueryName("scale_percent"), "scale");
   assert.equal(getCanonicalQueryName("custom_param"), "custom_param");
 });

@@ -116,6 +116,7 @@ const state = {
 };
 
 init().catch((error) => setStatus(error.message, true));
+registerServiceWorker();
 
 async function init() {
   state.renderer = createPreviewRenderer(elements.canvas);
@@ -174,6 +175,18 @@ function bindEvents() {
   });
 
   bindCanvasRotation();
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((error) => {
+      console.warn("Service worker registration failed:", error);
+    });
+  });
 }
 
 function bindCanvasRotation() {

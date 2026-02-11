@@ -2,9 +2,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./src/logo.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="./src/logo-light.svg" />
-    <img src="./src/logo-light.svg" alt="Open Brick logo" width="120" />
+    <source media="(prefers-color-scheme: dark)" srcset="./src/logo-wordmark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="./src/logo-wordmark-light.svg" />
+    <img src="./src/logo-wordmark-light.svg" alt="Open Brick logo" width="360" />
   </picture>
 </p>
 
@@ -13,14 +13,6 @@
 [![GitHub Stars](https://img.shields.io/github/stars/timcogan/open-brick?style=social)](https://github.com/timcogan/open-brick/stargazers)
 [![Last Commit](https://img.shields.io/github/last-commit/timcogan/open-brick)](https://github.com/timcogan/open-brick/commits/master)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-
-```text
-  ___  ____  _____ _   _   ____  ____  ___ ____ _  __
- / _ \|  _ \| ____| \ | | | __ )|  _ \|_ _/ ___| |/ /
-| | | | |_) |  _| |  \| | |  _ \| |_) || | |   | ' / 
-| |_| |  __/| |___| |\  | | |_) |  _ < | | |___| . \ 
- \___/|_|   |_____|_| \_| |____/|_| \_\___\____|_|\_\
-```
 
 ## Live App
 [https://openbrick.cogan.dev](https://openbrick.cogan.dev)

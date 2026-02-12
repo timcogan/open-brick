@@ -729,7 +729,7 @@ function createCubeTriangles(size, center) {
   ];
 
   const triangles = [];
-  appendQuad(triangles, vertices[0], vertices[2], vertices[1], vertices[3]);
+  appendQuad(triangles, vertices[0], vertices[3], vertices[2], vertices[1]);
   appendQuad(triangles, vertices[4], vertices[5], vertices[6], vertices[7]);
   appendQuad(triangles, vertices[0], vertices[1], vertices[5], vertices[4]);
   appendQuad(triangles, vertices[1], vertices[2], vertices[6], vertices[5]);

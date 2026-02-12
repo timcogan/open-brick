@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { computeBounds, evaluateScad, parseScad, parseTemplateMetadata, toAsciiStl } from '../src/scad-engine.mjs';
+import { computeBounds, computeNormal, evaluateScad, parseScad, parseTemplateMetadata, toAsciiStl } from '../src/scad-engine.mjs';
 
 const source = readFileSync(new URL('../scad/classic_brick.scad', import.meta.url), 'utf8');
 const metadata = parseTemplateMetadata(source, 'classic_brick');
@@ -61,4 +61,26 @@ test('STL export includes the expected solid header/footer', () => {
 
   assert.ok(stl.startsWith('solid classic_brick'));
   assert.ok(stl.includes('\nendsolid classic_brick'));
+});
+
+test('cube triangles keep outward winding on all faces', () => {
+  const cubeAst = parseScad('cube([2, 3, 4], center=false);');
+  const triangles = evaluateScad(cubeAst, {});
+  const cubeCenter = [1, 1.5, 2];
+
+  for (const triangle of triangles) {
+    const faceCenter = [
+      (triangle[0][0] + triangle[1][0] + triangle[2][0]) / 3,
+      (triangle[0][1] + triangle[1][1] + triangle[2][1]) / 3,
+      (triangle[0][2] + triangle[1][2] + triangle[2][2]) / 3,
+    ];
+    const outward = [
+      faceCenter[0] - cubeCenter[0],
+      faceCenter[1] - cubeCenter[1],
+      faceCenter[2] - cubeCenter[2],
+    ];
+    const normal = computeNormal(triangle);
+    const alignment = normal[0] * outward[0] + normal[1] * outward[1] + normal[2] * outward[2];
+    assert.ok(alignment > 0, `triangle winding should point outward, got alignment=${alignment}`);
+  }
 });

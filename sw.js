@@ -1,10 +1,10 @@
-const CACHE_NAME = "open-brick-shell-v20260211d";
+const CACHE_NAME = "open-brick-shell-v20260211e";
 const APP_SHELL_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./src/styles.css",
-  "./src/app.js?v=20260211a",
+  "./src/app.js?v=20260211b",
   "./src/scad-engine.mjs",
   "./src/share-query.mjs",
   "./src/logo.svg",

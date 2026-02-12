@@ -36,6 +36,9 @@ const DEFAULT_ROTATION = {
   x: degToRad(-52),
   y: degToRad(46),
 };
+const DEFAULT_ZOOM = 100;
+const ZOOM_MIN = 30;
+const ZOOM_MAX = 280;
 
 const BRICK_COLOR_HEX = "#ffffff";
 const BACKDROP_TOP = [0.047, 0.078, 0.125];
@@ -93,6 +96,7 @@ const elements = {
   scadSource: document.querySelector("#scadSource"),
   rotationX: document.querySelector("#rotationX"),
   rotationY: document.querySelector("#rotationY"),
+  zoomLevel: document.querySelector("#zoomLevel"),
   resetViewButton: document.querySelector("#resetViewButton"),
 };
 
@@ -108,6 +112,7 @@ const state = {
     x: DEFAULT_ROTATION.x,
     y: DEFAULT_ROTATION.y,
   },
+  zoom: DEFAULT_ZOOM,
   dragging: false,
   lastPointer: {
     x: 0,
@@ -119,9 +124,10 @@ init().catch((error) => setStatus(error.message, true));
 registerServiceWorker();
 
 async function init() {
+  ensureZoomControl();
   state.renderer = createPreviewRenderer(elements.canvas);
   bindEvents();
-  syncRotationControls();
+  syncViewControls();
   drawEmptyPreview("Loading...");
   fillTemplateSelect(TEMPLATE_CATALOG);
 
@@ -163,10 +169,18 @@ function bindEvents() {
     renderPreview();
   });
 
+  if (elements.zoomLevel) {
+    elements.zoomLevel.addEventListener("input", () => {
+      state.zoom = clamp(Number(elements.zoomLevel.value), ZOOM_MIN, ZOOM_MAX);
+      renderPreview();
+    });
+  }
+
   elements.resetViewButton.addEventListener("click", () => {
     state.rotation.x = DEFAULT_ROTATION.x;
     state.rotation.y = DEFAULT_ROTATION.y;
-    syncRotationControls();
+    state.zoom = DEFAULT_ZOOM;
+    syncViewControls();
     renderPreview();
   });
 
@@ -189,6 +203,39 @@ function registerServiceWorker() {
   });
 }
 
+function ensureZoomControl() {
+  if (elements.zoomLevel) {
+    return;
+  }
+
+  const viewControls = document.querySelector(".view-controls");
+  if (!viewControls) {
+    return;
+  }
+
+  const zoomField = document.createElement("label");
+  zoomField.className = "mini-field";
+  zoomField.setAttribute("for", "zoomLevel");
+  zoomField.textContent = "Zoom";
+
+  const zoomInput = document.createElement("input");
+  zoomInput.id = "zoomLevel";
+  zoomInput.type = "range";
+  zoomInput.min = String(ZOOM_MIN);
+  zoomInput.max = String(ZOOM_MAX);
+  zoomInput.step = "1";
+  zoomInput.value = String(DEFAULT_ZOOM);
+
+  zoomField.append(zoomInput);
+  viewControls.append(zoomField);
+  elements.zoomLevel = zoomInput;
+
+  const hint = document.querySelector(".hint");
+  if (hint) {
+    hint.textContent = "Drag to rotate. Use mouse wheel or Zoom slider to zoom.";
+  }
+}
+
 function bindCanvasRotation() {
   const canvas = elements.canvas;
 
@@ -209,7 +256,7 @@ function bindCanvasRotation() {
 
     state.rotation.y = normalizeAngle(state.rotation.y + dx * 0.0045);
     state.rotation.x = normalizeAngle(state.rotation.x + dy * 0.0045);
-    syncRotationControls();
+    syncViewControls();
     renderPreview();
   });
 
@@ -222,6 +269,29 @@ function bindCanvasRotation() {
 
   canvas.addEventListener("pointerup", stopDragging);
   canvas.addEventListener("pointercancel", stopDragging);
+
+  canvas.addEventListener(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+      let delta = event.deltaY;
+      if (event.deltaMode === 1) {
+        delta *= 16;
+      } else if (event.deltaMode === 2) {
+        delta *= window.innerHeight;
+      }
+
+      const zoomFactor = Math.exp(-delta * 0.0013);
+      const nextZoom = clamp(state.zoom * zoomFactor, ZOOM_MIN, ZOOM_MAX);
+      if (Math.abs(nextZoom - state.zoom) < 0.001) {
+        return;
+      }
+      state.zoom = nextZoom;
+      syncViewControls();
+      renderPreview();
+    },
+    { passive: false }
+  );
 }
 
 function createPreviewRenderer(canvas) {
@@ -268,6 +338,9 @@ function createPreviewRenderer(canvas) {
 
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.CULL_FACE);
+  gl.cullFace(gl.BACK);
+  gl.frontFace(gl.CCW);
   gl.disable(gl.BLEND);
 
   return renderer;
@@ -600,7 +673,7 @@ function renderPreviewWebgl(renderer, mesh) {
 
   const aspect = canvas.width / Math.max(1, canvas.height);
   const maxSize = Math.max(1, mesh.maxSize);
-  const cameraDistance = maxSize * 3.6 + 36;
+  const cameraDistance = getCameraDistance(maxSize);
   const projection = createPerspectiveMatrix(degToRad(46), aspect, 1, cameraDistance + maxSize * 10 + 160);
   const view = createTranslationMatrix(0, 0, -cameraDistance);
   const rotationZ = createRotationZMatrix(state.rotation.y);
@@ -647,7 +720,7 @@ function renderPreview2d() {
 
   const color = getBrickColor();
   const maxSize = Math.max(1, ...bounds.size);
-  const cameraDistance = maxSize * 3.6 + 36;
+  const cameraDistance = getCameraDistance(maxSize);
   const scale = Math.min(width, height) / (maxSize * 2.7);
   const light = normalize([0.35, -0.5, 0.8]);
   const faces = [];
@@ -676,6 +749,15 @@ function renderPreview2d() {
     }
 
     const normal = computeNormal(transformed);
+    const center = [
+      (transformed[0][0] + transformed[1][0] + transformed[2][0]) / 3,
+      (transformed[0][1] + transformed[1][1] + transformed[2][1]) / 3,
+      (transformed[0][2] + transformed[1][2] + transformed[2][2]) / 3,
+    ];
+    const toCamera = normalize([-center[0], -center[1], -cameraDistance - center[2]]);
+    if (dot(normal, toCamera) <= 0) {
+      continue;
+    }
     const lightPower = clamp(dot(normal, light), 0, 1);
     const intensity = 0.28 + lightPower * 0.72;
     faces.push({
@@ -990,12 +1072,21 @@ function buildFileName() {
   return `${state.activeTemplate.id}${suffix}.stl`;
 }
 
-function syncRotationControls() {
+function syncViewControls() {
   if (!elements.rotationX || !elements.rotationY) {
     return;
   }
   elements.rotationX.value = String(Math.round(radToDeg(state.rotation.x)));
   elements.rotationY.value = String(Math.round(radToDeg(normalizeAngle(state.rotation.y))));
+  if (elements.zoomLevel) {
+    elements.zoomLevel.value = String(Math.round(state.zoom));
+  }
+}
+
+function getCameraDistance(maxSize) {
+  const baseDistance = maxSize * 3.6 + 36;
+  const zoom = clamp(state.zoom, ZOOM_MIN, ZOOM_MAX);
+  return baseDistance / (zoom / 100);
 }
 
 function normalizeAngle(radians) {

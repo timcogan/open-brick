@@ -23,16 +23,19 @@ outert = 0.15 * s;
 actualX = X * block - outert;
 actualY = Y * block - outert;
 
-topthickness = unit;
 wallthickness = unit - outert / 2;
-inner_h = height - topthickness;
-
 hstud = unit + 0.2 * s;
 dstud = unit * 3;
+// Keep underside cavity close to stud insertion depth with a small tolerance margin.
+socket_clearance_h = hstud + 0.35 * s;
+inner_h = socket_clearance_h;
+topthickness = height - inner_h;
+// Slight overlap removes coplanar internal seams that can look translucent in preview.
+seam_overlap = 0.03 * s;
 
 // Tube-like underside socket dimensions.
 ODtube = 6.5137 * s;
-tube_h = inner_h;
+tube_h = inner_h + seam_overlap;
 
 stud_x0 = (block - outert) / 2;
 stud_y0 = (block - outert) / 2;
@@ -41,8 +44,8 @@ tube_y0 = block - outert / 2;
 
 union() {
   // Hollow body shell with open bottom.
-  translate([0, 0, height - topthickness]) {
-    cube([actualX, actualY, topthickness], center=false);
+  translate([0, 0, height - topthickness - seam_overlap]) {
+    cube([actualX, actualY, topthickness + seam_overlap], center=false);
   }
   cube([wallthickness, actualY, inner_h], center=false);
   translate([actualX - wallthickness, 0, 0]) {

@@ -38,7 +38,29 @@ test("buildShareQuery writes canonical query params", () => {
     scale_percent: 101,
   });
 
-  assert.equal(query, "?template=classic_brick&width=6&length=4&height=2&scale=101");
+  assert.equal(query, "?width=6&length=4&height=2&scale=101");
+});
+
+test("buildShareQuery omits params that match defaults", () => {
+  const query = buildShareQuery(CLASSIC_TEMPLATE, {
+    X: 4,
+    Y: 2,
+    Z: 3,
+    scale_percent: 100,
+  });
+
+  assert.equal(query, "");
+});
+
+test("buildShareQuery omits scale when it matches default", () => {
+  const query = buildShareQuery(CLASSIC_TEMPLATE, {
+    X: 6,
+    Y: 4,
+    Z: 2,
+    scale_percent: 100,
+  });
+
+  assert.equal(query, "?width=6&length=4&height=2");
 });
 
 test("buildShareQuery omits height for templates that do not define Z", () => {
@@ -86,6 +108,22 @@ test("parseShareQuery supports aliases and clamps values", () => {
   });
 });
 
+test("parseShareQuery supports spaced template aliases", () => {
+  const parsed = parseShareQuery("?template=classic%20brick&width=5&length=3&height=4&scale=100", [
+    TILE_TEMPLATE,
+    CLASSIC_TEMPLATE,
+  ]);
+
+  assert.ok(parsed);
+  assert.equal(parsed.templateId, "classic_brick");
+  assert.deepEqual({ ...parsed.params }, {
+    X: 5,
+    Y: 3,
+    Z: 4,
+    scale_percent: 100,
+  });
+});
+
 test("parseShareQuery falls back to first template when template is missing", () => {
   const parsed = parseShareQuery("?width=5&length=3&height=4&scale=100", [CLASSIC_TEMPLATE]);
 
@@ -122,6 +160,19 @@ test("parseShareQuery supports mechanical axle l param", () => {
   assert.deepEqual({ ...parsed.params }, {
     L: 8,
     scale_percent: 98,
+  });
+});
+
+test("parseShareQuery applies defaults when only template is present", () => {
+  const parsed = parseShareQuery("?template=classic_brick", [CLASSIC_TEMPLATE]);
+
+  assert.ok(parsed);
+  assert.equal(parsed.templateId, "classic_brick");
+  assert.deepEqual({ ...parsed.params }, {
+    X: 4,
+    Y: 2,
+    Z: 3,
+    scale_percent: 100,
   });
 });
 

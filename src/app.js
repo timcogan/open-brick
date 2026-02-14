@@ -508,10 +508,10 @@ function findTemplateCatalogEntry(templateHint) {
     return null;
   }
 
+  const templateHintSlug = toSlug(normalizedHint);
   return (
     TEMPLATE_CATALOG.find((entry) => {
-      const entryId = normalizeTemplateHint(entry.id);
-      return entryId === normalizedHint || entryId.replace(/_/g, "-") === normalizedHint;
+      return toSlug(entry.id) === templateHintSlug;
     }) || null
   );
 }
@@ -521,6 +521,14 @@ function normalizeTemplateHint(value) {
     return "";
   }
   return String(value).trim().toLowerCase();
+}
+
+function toSlug(value) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function applyParamsToControls(params) {

@@ -4,6 +4,7 @@ const PARAM_QUERY_NAMES = {
   Z: ["height", "z"],
   scale_percent: ["scale", "scale_percent"],
 };
+const DEFAULT_TEMPLATE_ID = "classic_brick";
 
 export function parseShareQuery(search, templates) {
   if (!Array.isArray(templates) || templates.length === 0) {
@@ -43,18 +44,26 @@ export function parseShareQuery(search, templates) {
   };
 }
 
-export function buildShareQuery(template, params = {}) {
+export function buildShareQuery(template, params = {}, options = {}) {
   const query = new URLSearchParams();
-  query.set("template", template.id);
+  const defaultTemplateHint = options.defaultTemplateId || DEFAULT_TEMPLATE_ID;
+  if (!isMatchingTemplateHint(template.id, defaultTemplateHint)) {
+    query.set("template", template.id);
+  }
 
   for (const param of template.params) {
     const queryKey = getCanonicalQueryName(param.key);
     const rawValue = Number(params[param.key] ?? param.defaultValue);
     const numericValue = Number.isFinite(rawValue) ? rawValue : param.defaultValue;
-    query.set(queryKey, formatShareNumber(clamp(numericValue, param.min, param.max)));
+    const clampedValue = clamp(numericValue, param.min, param.max);
+    if (clampedValue === param.defaultValue) {
+      continue;
+    }
+    query.set(queryKey, formatShareNumber(clampedValue));
   }
 
-  return `?${query.toString()}`;
+  const search = query.toString();
+  return search ? `?${search}` : "";
 }
 
 export function getCanonicalQueryName(paramKey) {
@@ -88,17 +97,20 @@ function findTemplateByHint(templateHintRaw, templates) {
     return null;
   }
 
-  const templateHint = String(templateHintRaw).trim().toLowerCase();
+  const templateHint = toSlug(templateHintRaw);
   if (!templateHint) {
     return null;
   }
 
   return (
     templates.find((template) => {
-      const templateId = String(template.id).toLowerCase();
-      return templateId === templateHint || templateId.replace(/_/g, "-") === templateHint || toSlug(template.id) === templateHint;
+      return toSlug(template.id) === templateHint;
     }) || null
   );
+}
+
+function isMatchingTemplateHint(templateId, templateHint) {
+  return toSlug(templateId) === toSlug(templateHint);
 }
 
 function toSlug(value) {

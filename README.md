@@ -43,7 +43,7 @@ Where:
 - `template`: `classic_brick`, `classic_plate`, `classic_tile`, or `mechanical_axle`
 - `width`: studs in X (`classic_brick`: 1-10, `classic_plate`/`classic_tile`: 1-16)
 - `length`: studs in Y (`classic_brick`: 1-12, `classic_plate`/`classic_tile`: 1-16)
-- `height`: plate units in Z (`classic_brick`: 1-9)
+- `height`: plate units in Z (`classic_brick`: 1-24)
 - `l`: axle length (`mechanical_axle`: 1-16)
 - `scale`: global scale percent (90-110)
 

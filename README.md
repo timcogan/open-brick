@@ -8,11 +8,11 @@
   </picture>
 </p>
 
-[![Live App](https://img.shields.io/badge/Live%20App-openbrick.cogan.dev-0b7285)](https://openbrick.cogan.dev)
-[![CI and Pages](https://github.com/timcogan/open-brick/actions/workflows/ci-pages.yml/badge.svg)](https://github.com/timcogan/open-brick/actions/workflows/ci-pages.yml)
-[![GitHub Stars](https://img.shields.io/github/stars/timcogan/open-brick?style=social)](https://github.com/timcogan/open-brick/stargazers)
-[![Last Commit](https://img.shields.io/github/last-commit/timcogan/open-brick)](https://github.com/timcogan/open-brick/commits/master)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Live App](https://img.shields.io/badge/Live%20App-openbrick.cogan.dev-0b7285?style=for-the-badge)](https://openbrick.cogan.dev)
+[![CI and Pages](https://img.shields.io/github/actions/workflow/status/timcogan/open-brick/ci-pages.yml?branch=master&style=for-the-badge&label=CI%20and%20Pages)](https://github.com/timcogan/open-brick/actions/workflows/ci-pages.yml)
+[![GitHub Stars](https://img.shields.io/github/stars/timcogan/open-brick?style=for-the-badge&label=GitHub%20Stars)](https://github.com/timcogan/open-brick/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/timcogan/open-brick?style=for-the-badge&label=Last%20Commit)](https://github.com/timcogan/open-brick/commits/master)
+[![License](https://img.shields.io/github/license/timcogan/open-brick?style=for-the-badge&label=License)](./LICENSE)
 
 ## Live App
 [https://openbrick.cogan.dev](https://openbrick.cogan.dev)

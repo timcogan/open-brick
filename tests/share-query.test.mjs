@@ -8,7 +8,7 @@ const CLASSIC_TEMPLATE = {
   params: [
     { key: "X", min: 1, max: 10, defaultValue: 4 },
     { key: "Y", min: 1, max: 12, defaultValue: 2 },
-    { key: "Z", min: 1, max: 9, defaultValue: 3 },
+    { key: "Z", min: 1, max: 24, defaultValue: 3 },
     { key: "scale_percent", min: 90, max: 110, defaultValue: 100 },
   ],
 };
@@ -96,14 +96,14 @@ test("parseShareQuery reads canonical query params", () => {
 });
 
 test("parseShareQuery supports aliases and clamps values", () => {
-  const parsed = parseShareQuery("?template=classic-brick&x=100&y=1&z=9&scale_percent=999", [CLASSIC_TEMPLATE]);
+  const parsed = parseShareQuery("?template=classic-brick&x=100&y=1&z=999&scale_percent=999", [CLASSIC_TEMPLATE]);
 
   assert.ok(parsed);
   assert.equal(parsed.templateId, "classic_brick");
   assert.deepEqual({ ...parsed.params }, {
     X: 10,
     Y: 1,
-    Z: 9,
+    Z: 24,
     scale_percent: 110,
   });
 });

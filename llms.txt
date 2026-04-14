@@ -15,7 +15,7 @@ Canonical URL shapes:
 - https://openbrick.cogan.dev/?template=mechanical_axle&l={L}&scale={SCALE}
 
 Allowed ranges:
-- classic_brick: width 1..10, length 1..12, height 1..9, scale 90..110
+- classic_brick: width 1..10, length 1..12, height 1..24, scale 90..110
 - classic_plate: width 1..16, length 1..16, scale 90..110
 - classic_tile: width 1..16, length 1..16, scale 90..110
 - mechanical_axle: l 1..16, scale 90..110
